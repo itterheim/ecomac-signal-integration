@@ -9,6 +9,7 @@
     "build": "parcel build index.html -d ./build --public-url ./"
   },
   "devDependencies": {
+    "cssnano": "^4.1.10",
     "typescript": "3.4.5"
   }
 }
