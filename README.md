@@ -1,1 +1,0 @@
-# ECOMAC Signal Integration tool
