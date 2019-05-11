@@ -34,15 +34,17 @@ div#controls {
     align-items: flex-start;
 }
 
-div#controls button {
+button {
     border: 1px solid #777;
     background: #fff;
     border-radius: 2px;
     padding: 3px 5px;
     margin: 5px;
+    outline: none;
+    cursor: pointer;
 }
 
-div#controls button.selected {
+button.selected {
     background: #eee;
 }
 
@@ -50,6 +52,6 @@ button#start {
     border-color: #0fbe05
 }
 
-button#start {
+button#end {
     border-color: #d00
 }

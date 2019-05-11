@@ -79,7 +79,15 @@ export class Chart {
                     });
                 }
 
-                this.marks.sort((a, b) => a.time > b.time ? 1 : -1);
+                this.marks.sort((a, b) => {
+                    if (a.time > b.time) {
+                        return 1;
+                    } else if (a.index === b.index && a.type === 'end') {
+                        return -1;
+                    } else {
+                        return -1;
+                    }
+                });
 
                 this.render();
                 if (this.onMarksUpdated) { this.onMarksUpdated(this.marks); }
