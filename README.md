@@ -1,2 +1,1 @@
-# ecomac-signal-integration
-ECOMAC signal integration tool
+# ECOMAC Signal Integration tool
