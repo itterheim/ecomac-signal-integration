@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "lib": ["es6", "dom"],
+        "module": "commonjs",
+        "target": "es5"
+    },
+    "include": [
+        "./ts/**/*"
+    ],
+    "exclude": [
+        "./dist",
+        "./node_modules"
+    ]
+}
