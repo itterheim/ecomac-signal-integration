@@ -1,9 +1,25 @@
 import { IData, IValue } from './Data';
 
+type Tool = 'start' | 'end' | 'move';
+
+export interface IMark extends IValue {
+    type: 'start' | 'end';
+    index: number;
+}
+
+interface IPoint {
+    x: number;
+    y: number;
+}
+
 export class Chart {
+    public onMarksUpdated: (marks: IMark[]) => void;
+
     private ctx: CanvasRenderingContext2D;
+    private tool: Tool = 'start';
 
     private data?: IData;
+    private marks: IMark[] = [];
 
     private minTime: number;
     private maxTime: number;
@@ -16,6 +32,9 @@ export class Chart {
     private padding = { t: 40, r: 40, b: 50, l: 100};
     private scale = 1;
     private offset = this.padding.l;
+
+    private selectionTime: number;
+    private selectionIndex: number;
 
     constructor (private canvas: HTMLCanvasElement) {
         this.ctx = this.canvas.getContext('2d');
@@ -42,7 +61,29 @@ export class Chart {
         };
 
         this.canvas.onmousedown = (e) => {
-            mouseStart = this.getMousePosition(e);
+            if (this.tool === 'move' || e.ctrlKey) {
+                mouseStart = this.getMousePosition(e);
+            } else if (this.selectionIndex !== undefined) {
+                const value = this.data.values[this.selectionIndex];
+                const type = this.tool === 'start' ? 'start' : 'end';
+
+                const markIndex = this.marks.findIndex((x) => x.index === this.selectionIndex && x.type === type);
+
+                if (markIndex > -1) {
+                    this.marks.splice(markIndex, 1);
+                } else {
+                    this.marks.push({
+                        type,
+                        index: this.selectionIndex,
+                        ...value
+                    });
+                }
+
+                this.marks.sort((a, b) => a.time > b.time ? 1 : -1);
+
+                this.render();
+                if (this.onMarksUpdated) { this.onMarksUpdated(this.marks); }
+            }
         };
 
         this.canvas.onmouseup = () => {
@@ -62,6 +103,19 @@ export class Chart {
                 this.offset = Math.max(this.offset, (-1 * this.scale * this.canvas.width) + this.canvas.width / 2);
 
                 mouseStart = position;
+                this.render();
+            } else {
+                const mouse = this.getMousePosition(e);
+                const px = -1 * this.offset + mouse.x;
+                const width = this.scale * (this.canvas.width - this.padding.l - this.padding.r);
+                const r = px / width;
+
+                this.selectionTime = this.min.time + this.timeRange * r;
+                this.selectionIndex = undefined;
+                for (let i = 0; i < this.data.values.length && this.data.values[i].time < this.selectionTime; i++) {
+                    this.selectionIndex = i;
+                }
+
                 this.render();
             }
         };
@@ -84,6 +138,12 @@ export class Chart {
         this.render();
     }
 
+    public setTool (tool: Tool) {
+        this.tool = tool;
+        this.selectionIndex = undefined;
+        this.selectionTime = undefined;
+    }
+
     public render () {
         this.clear();
 
@@ -100,26 +160,84 @@ export class Chart {
         const heightRatio = height / this.range;
 
         this.ctx.strokeStyle = '#000';
-        this.ctx.lineWidth = 1.2;
+        this.ctx.lineWidth = 0.8;
         this.ctx.beginPath();
 
         let time: number;
-        for (const value of this.data.values) {
+        let selectedX: number;
+        let selectedY: number;
+        for (let i = 0; i < this.data.values.length; i++) {
+            const value = this.data.values[i];
             const x = this.offset + (value.time - this.minTime) * widthRatio;
             const y = this.padding.t + height - ((value.signal - this.min.signal) * heightRatio);
 
-            if (time) {
-                this.ctx.lineTo(x, y);
-            } else {
-                this.ctx.moveTo(x, y);
+            if (x > 0) {
+                if (time) {
+                    this.ctx.lineTo(x, y);
+                } else {
+                    this.ctx.moveTo(x, y);
+                }
+                time = value.time;
+
+                if (i === this.selectionIndex) {
+                    selectedX = x;
+                    selectedY = y;
+                }
             }
 
-            time = value.time;
         }
-
         this.ctx.stroke();
 
-        this.ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        if (this.tool !== 'move') {
+            this.ctx.lineWidth = 1.2;
+            this.ctx.beginPath();
+            this.ctx.moveTo(selectedX, selectedY);
+            if (this.tool === 'start') {
+                this.ctx.lineTo(selectedX, selectedY + 15);
+            } else if (this.tool === 'end') {
+                this.ctx.lineTo(selectedX, selectedY - 15);
+            }
+            this.ctx.stroke();
+        }
+
+        for (const mark of this.marks) {
+            const x = this.offset + (mark.time - this.minTime) * widthRatio;
+            const y = this.padding.t + height - ((mark.signal - this.min.signal) * heightRatio);
+
+            this.ctx.lineWidth = 1;
+            this.ctx.beginPath();
+            this.ctx.moveTo(x, y);
+            if (mark.type === 'start') {
+                this.ctx.strokeStyle = '#0fbe05';
+                this.ctx.lineTo(x, y + 10);
+            } else if (mark.type === 'end') {
+                this.ctx.strokeStyle = '#d00';
+                this.ctx.lineTo(x, y - 10);
+            }
+            this.ctx.stroke();
+        }
+
+        let lineStart: IPoint;
+        for (let i = 0; i < this.marks.length; i++) {
+            const mark = this.marks[i];
+            const x = this.offset + (mark.time - this.minTime) * widthRatio;
+            const y = this.padding.t + height - ((mark.signal - this.min.signal) * heightRatio);
+
+            if (mark.type === 'start' && !lineStart) {
+                lineStart = {x, y};
+            } else if (mark.type === 'end' && lineStart) {
+                this.ctx.lineWidth = 1;
+                this.ctx.strokeStyle = '#777';
+                this.ctx.beginPath();
+                this.ctx.moveTo(lineStart.x, lineStart.y);
+                this.ctx.lineTo(x, y);
+                this.ctx.stroke();
+
+                lineStart = undefined;
+            }
+        }
+
+        this.ctx.fillStyle = 'rgba(255,255,255,1)';
         this.ctx.fillRect(0, 0, this.padding.l, this.canvas.height);
     }
 

@@ -10,3 +10,46 @@ canvas {
 
     border-bottom: 1px solid #777;
 }
+
+div {
+    box-sizing: border-box;
+}
+
+div#table {
+    display: block;
+    overflow: auto;
+    float: left;
+    width: 60%;
+    border-right: 1px solid #777;
+}
+
+div#controls {
+    display: block;
+    overflow: auto;
+    float: right;
+    width: 40%;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+div#controls button {
+    border: 1px solid #777;
+    background: #fff;
+    border-radius: 2px;
+    padding: 3px 5px;
+    margin: 5px;
+}
+
+div#controls button.selected {
+    background: #eee;
+}
+
+button#start {
+    border-color: #0fbe05
+}
+
+button#start {
+    border-color: #d00
+}
