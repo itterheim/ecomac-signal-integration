@@ -80,10 +80,12 @@ export class Chart {
                 }
 
                 this.marks.sort((a, b) => {
-                    if (a.time > b.time) {
+                    if (a.index > b.index) {
                         return 1;
                     } else if (a.index === b.index && a.type === 'end') {
                         return -1;
+                    } else if (a.index === b.index && a.type === 'start') {
+                        return 1;
                     } else {
                         return -1;
                     }
@@ -118,10 +120,12 @@ export class Chart {
                 const width = this.scale * (this.canvas.width - this.padding.l - this.padding.r);
                 const r = px / width;
 
-                this.selectionTime = this.min.time + this.timeRange * r;
-                this.selectionIndex = undefined;
-                for (let i = 0; i < this.data.values.length && this.data.values[i].time < this.selectionTime; i++) {
-                    this.selectionIndex = i;
+                if (this.timeRange) {
+                    this.selectionTime = this.min.time + this.timeRange * r;
+                    this.selectionIndex = undefined;
+                    for (let i = 0; i < this.data.values.length && this.data.values[i].time < this.selectionTime; i++) {
+                        this.selectionIndex = i;
+                    }
                 }
 
                 this.render();
