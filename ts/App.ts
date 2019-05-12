@@ -27,7 +27,7 @@ export class App {
         window.onresize = () => {
             this.resize();
             this.chart.render();
-            this.table.update();
+            this.table.update(this.marks, this.data ? this.data.values : undefined);
         };
 
         this.resize();

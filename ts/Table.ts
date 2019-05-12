@@ -5,6 +5,7 @@ interface IPeak {
     start: number;
     end: number;
     previous: IMark;
+    next: IMark;
     values: IValue[];
     response: number;
 }
@@ -14,6 +15,7 @@ export class Table {
     private values: IValue[] = [];
 
     private maxSignal: number = 0;
+    private minSignal: number = 0;
 
     private readonly decimals = 6;
 
@@ -25,7 +27,9 @@ export class Table {
         this.marks = marks;
         this.values = values;
 
-        this.maxSignal = Math.max.apply(null, values.map((x) => x.signal));
+        const signals = values.map((x) => x.signal);
+        this.maxSignal = Math.max.apply(null, signals);
+        this.minSignal = Math.min.apply(null, signals);
 
         this.target.innerHTML = '';
 
@@ -73,9 +77,10 @@ export class Table {
                 for (let j = 0; j < lastMarks.length; j++) {
                     peaks.push({
                         start: lastMarks[j].time,
-                        end: mark.time,
+                        end: lastMarks[j + 1] && lastMarks[j + 1].type === 'start' ? lastMarks[j + 1].time : mark.time,
                         previous: j > 0 ? lastMarks[0] : undefined,
-                        values: this.getValues(lastMarks[j], mark),
+                        next: lastMarks[j + 1] && lastMarks[j + 1].type === 'start' ? mark : undefined,
+                        values: this.getValues(lastMarks[j], lastMarks[j + 1] && lastMarks[j + 1].type === 'start' ? lastMarks[j + 1] : mark),
                         response: 0
                     });
                 }
@@ -85,7 +90,11 @@ export class Table {
         }
 
         for (const peak of peaks) {
-            peak.response = this.getResponse(peak.values, this.values[peak.previous ? peak.previous.index : undefined]);
+            peak.response = this.getResponse(
+                peak.values,
+                this.values[peak.previous ? peak.previous.index : undefined],
+                this.values[peak.next ? peak.next.index : undefined]
+            );
         }
 
         return peaks;
@@ -95,9 +104,9 @@ export class Table {
         return [...this.values.slice(from.index, to.index + 1)];
     }
 
-    private getResponse (values: IValue[], previous: IValue): number {
+    private getResponse (values: IValue[], previous?: IValue, next?: IValue): number {
         const baseFrom: IValue = previous ? { time: previous.time, signal: previous.signal } : { time: values[0].time, signal: values[0].signal };
-        const baseTo: IValue = { time: values[values.length - 1].time, signal: values[values.length - 1].signal };
+        const baseTo: IValue = next ? { time: next.time, signal: next.signal } : { time: values[values.length - 1].time, signal: values[values.length - 1].signal };
 
         let totalArea = 0;
 
@@ -108,14 +117,14 @@ export class Table {
                 baseFrom, baseTo,
                 // values[i],
                 { time: values[i].time, signal: this.maxSignal },
-                { time: values[i].time, signal: 0 }
+                { time: values[i].time, signal: this.minSignal }
             );
 
             const intRight = this.getIntersection(
                 baseFrom, baseTo,
                 // values[i + 1],
                 { time: values[i + 1].time, signal: this.maxSignal },
-                { time: values[i + 1].time, signal: 0 }
+                { time: values[i + 1].time, signal: this.minSignal }
             );
 
             const a = values[i].signal - intLeft.signal;

@@ -121,7 +121,7 @@ export class Chart {
                 const r = px / width;
 
                 if (this.timeRange) {
-                    this.selectionTime = this.min.time + this.timeRange * r;
+                    this.selectionTime = this.minTime + this.timeRange * r;
                     this.selectionIndex = undefined;
                     for (let i = 0; i < this.data.values.length && this.data.values[i].time < this.selectionTime; i++) {
                         this.selectionIndex = i;
@@ -133,7 +133,6 @@ export class Chart {
         };
 
         document.onkeyup = (e) => {
-            console.log(e);
             if (e.code === 'KeyS') { this.tool = 'start'; }
             if (e.code === 'KeyE') { this.tool = 'end'; }
             if (e.code === 'KeyM') { this.tool = 'move'; }
@@ -145,6 +144,11 @@ export class Chart {
     public setData (data: IData) {
         this.data = data;
         this.marks = [];
+
+        this.scale = 1;
+        this.offset = this.padding.l;
+        this.selectionTime = undefined;
+        this.selectionIndex = undefined;
 
         this.min = undefined;
         this.max = undefined;
