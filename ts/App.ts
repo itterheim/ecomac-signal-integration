@@ -21,7 +21,7 @@ export class App {
 
         this.chart.onMarksUpdated = (marks) => {
             this.marks = marks;
-            this.table.update(this.marks);
+            this.table.update(this.marks, this.data ? this.data.values : undefined);
         };
 
         window.onresize = () => {
@@ -33,10 +33,6 @@ export class App {
         this.run();
     }
 
-    private updateTable () {
-        console.log(this.marks);
-    }
-
     private createUI () {
         const template = `
             <canvas id="chart"></canvas>
@@ -44,7 +40,17 @@ export class App {
             <div id="controls">
                 <button id="start" class="selected">Start</button>
                 <button id="end">End</button>
-                <button id="move">Move (or hold Ctrl)</button>
+                <button id="move">Move</button>
+                <br/><br/>
+                <input type="file" name="datafile" id="datafile" accept="text/plain" />
+                <br/><br/>
+                <div class="shortcuts">
+                    Shortcuts:<br/>
+                    <b>s</b> - Start<br/>
+                    <b>e</b> - End<br/>
+                    <b>m</b> or hold <b>Ctrl</b> - Move<br/>
+                    <b>mouse wheel</b> - Zoom<br/>
+                </div>
             </div>
         `;
         document.body.insertAdjacentHTML('afterbegin', template);
@@ -56,6 +62,7 @@ export class App {
         const start = document.getElementById('start');
         const end = document.getElementById('end');
         const move = document.getElementById('move');
+        const input = document.getElementById('datafile') as HTMLInputElement;
 
         start.onclick = () => {
             start.classList.add('selected');
@@ -80,12 +87,20 @@ export class App {
 
             this.chart.setTool('move');
         };
+
+        input.onchange = async (e) => {
+            this.data = await getData(input.files[0]);
+
+            if (this.data) {
+                this.chart.setData(this.data);
+            }
+        };
     }
 
     private async run () {
-        const data = await getData();
+        // this.data = await getData();
 
-        this.chart.setData(data);
+        // this.chart.setData(this.data);
     }
 
     private resize () {

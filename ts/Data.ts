@@ -1,5 +1,3 @@
-import data01 from '../data/19_05_10_01.txt';
-
 export interface IValue {
     time: number;
     signal: number;
@@ -10,11 +8,24 @@ export interface IData {
     values: IValue[];
 }
 
-export async function getData (): Promise<IData> {
-    const response = await fetch(data01);
-    const text = await response.text();
+export async function getData (file: File): Promise<IData> {
+    const text = await readFile(file);
 
     return parseData(text);
+}
+
+async function readFile (file: File): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsText(file);
+
+        reader.onload = () => {
+            resolve(reader.result.toString());
+        };
+        reader.onerror = (e) => {
+            reject(e);
+        };
+    });
 }
 
 function parseData (text: string): IData {

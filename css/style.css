@@ -23,15 +23,36 @@ div#table {
     border-right: 1px solid #777;
 }
 
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table thead th {
+    border-bottom: 1px solid #aaa;
+    padding: 5px 0;
+}
+
+table tbody td {
+    font-family: monospace;
+    text-align: right;
+    padding: 3px 10px;
+    border-right: 1px solid #aaa;
+    border-bottom: 1px solid #aaa;
+}
+
+
+table tbody td:last-child {
+    border-right: none;
+}
+
 div#controls {
     display: block;
     overflow: auto;
     float: right;
     width: 40%;
     padding: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    text-align: center;
 }
 
 button {
@@ -54,4 +75,16 @@ button#start {
 
 button#end {
     border-color: #d00
+}
+
+input#datafile {
+    border: 1px solid #777;
+    background: #fff;
+    border-radius: 2px;
+    padding: 2px
+}
+
+div.shortcuts {
+    text-align: left;
+    display: inline-block;
 }

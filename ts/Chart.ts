@@ -131,6 +131,15 @@ export class Chart {
                 this.render();
             }
         };
+
+        document.onkeyup = (e) => {
+            console.log(e);
+            if (e.code === 'KeyS') { this.tool = 'start'; }
+            if (e.code === 'KeyE') { this.tool = 'end'; }
+            if (e.code === 'KeyM') { this.tool = 'move'; }
+
+            this.render();
+        };
     }
 
     public setData (data: IData) {
