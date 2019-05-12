@@ -1,12 +1,5 @@
-export interface IValue {
-    time: number;
-    signal: number;
-}
-
-export interface IData {
-    headers: { time: string, signal: string };
-    values: IValue[];
-}
+import { IData } from './interfaces/IData';
+import { IValue } from './interfaces/IValue';
 
 export async function getData (file: File): Promise<IData> {
     const text = await readFile(file);

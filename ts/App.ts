@@ -1,5 +1,7 @@
-import { Chart, IMark } from './Chart';
-import { getData, IData } from './Data';
+import { Chart } from './Chart';
+import { getData } from './Data';
+import { IData } from './interfaces/IData';
+import { IMark } from './interfaces/IMark';
 import { Table } from './Table';
 
 export class App {
@@ -52,7 +54,7 @@ export class App {
                     <b>m</b> or hold <b>Ctrl</b> - Move<br/>
                     <b>mouse wheel</b> - Zoom<br/>
                 </div>
-                <div id="version">Version: 2019-05-12T15:25:00+0200</div>
+                <div id="version">Version: 2019-05-12T20:50:00+0200</div>
             </div>
         `;
         document.body.insertAdjacentHTML('afterbegin', template);

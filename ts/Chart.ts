@@ -1,16 +1,8 @@
-import { IData, IValue } from './Data';
+import { IData } from "./interfaces/IData";
+import { IMark } from "./interfaces/IMark";
+import { IValue } from "./interfaces/IValue";
 
 type Tool = 'start' | 'end' | 'move';
-
-export interface IMark extends IValue {
-    type: 'start' | 'end';
-    index: number;
-}
-
-interface IPoint {
-    x: number;
-    y: number;
-}
 
 export class Chart {
     public onMarksUpdated: (marks: IMark[]) => void;

@@ -33,6 +33,15 @@ table thead th {
     padding: 5px 0;
 }
 
+table thead th.number {
+    width: 0;
+    padding-left: 20px;
+}
+
+table thead th:last-child {
+    padding-right: 20px;
+}
+
 table tbody td {
     font-family: monospace;
     text-align: right;
@@ -44,6 +53,7 @@ table tbody td {
 
 table tbody td:last-child {
     border-right: none;
+    padding-right: 20px;
 }
 
 div#controls {

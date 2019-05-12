@@ -1,14 +1,6 @@
-import { IMark } from './Chart';
-import { IData, IValue } from './Data';
-
-interface IPeak {
-    start: number;
-    end: number;
-    previous: IMark;
-    next: IMark;
-    values: IValue[];
-    response: number;
-}
+import { IMark } from './interfaces/IMark';
+import { IPeak } from './interfaces/IPeak';
+import { IValue } from './interfaces/IValue';
 
 export class Table {
     private marks: IMark[] = [];
@@ -36,10 +28,15 @@ export class Table {
         const peaks = this.getPeaks(marks);
 
         let rows = '';
-        for (const peak of peaks) {
-            rows += `<tr>
+        for (let i = 0; i < peaks.length; i++) {
+            const peak = peaks[i];
+            rows += `
+            <tr>
+                <td>${i + 1}</td>
                 <td>${peak.start.toFixed(this.decimals)}</td>
                 <td>${peak.end.toFixed(this.decimals)}</td>
+                <td>${peak.retention.time.toFixed(this.decimals)}</td>
+                <td>${peak.retention.signal.toFixed(this.decimals)}</td>
                 <td>${(peak.response * 60).toFixed(this.decimals)}</td>
             </tr>`;
         }
@@ -48,8 +45,11 @@ export class Table {
             <table>
                 <thead>
                     <tr>
+                        <th class="number"></th>
                         <th>Start [min]</th>
                         <th>End [min]</th>
+                        <th>Reten. Time [min]</th>
+                        <th>Reten. Signal [mV]</th>
                         <th>Response [mV.s]</th>
                     </tr>
                 </thead>
@@ -81,7 +81,8 @@ export class Table {
                         previous: j > 0 ? lastMarks[0] : undefined,
                         next: lastMarks[j + 1] && lastMarks[j + 1].type === 'start' ? mark : undefined,
                         values: this.getValues(lastMarks[j], lastMarks[j + 1] && lastMarks[j + 1].type === 'start' ? lastMarks[j + 1] : mark),
-                        response: 0
+                        response: 0,
+                        retention: undefined
                     });
                 }
 
@@ -95,6 +96,8 @@ export class Table {
                 this.values[peak.previous ? peak.previous.index : undefined],
                 this.values[peak.next ? peak.next.index : undefined]
             );
+
+            peak.retention = peak.values.reduce((p, x) => !p || x.signal > p.signal ? x : p, undefined);
         }
 
         return peaks;
@@ -131,7 +134,7 @@ export class Table {
             const b = values[i + 1].signal - intRight.signal;
 
             const area = ((a + b) / 2) * h;
-            totalArea += area;
+            totalArea += Math.abs(area);
         }
 
         return totalArea;
