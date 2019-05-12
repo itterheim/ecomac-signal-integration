@@ -88,3 +88,15 @@ div.shortcuts {
     text-align: left;
     display: inline-block;
 }
+
+div#version {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    background: #fff;
+    padding: 2px 1px 1px 2px;
+    font-size: 11px;
+    border: 1px solid #777;
+    border-radius: 3px 0 0 0;
+    border-width: 1px 0 0 1px;
+}

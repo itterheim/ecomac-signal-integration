@@ -52,6 +52,7 @@ export class App {
                     <b>m</b> or hold <b>Ctrl</b> - Move<br/>
                     <b>mouse wheel</b> - Zoom<br/>
                 </div>
+                <div id="version">Version: 2019-05-12T15:25:00+0200</div>
             </div>
         `;
         document.body.insertAdjacentHTML('afterbegin', template);
