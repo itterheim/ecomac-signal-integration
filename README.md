@@ -1,3 +1,3 @@
-# signal Integration for ECOMAC
+# Signal Integration for ECOMAC
 
 https://itterheim.github.io/ecomac-signal-integration/
