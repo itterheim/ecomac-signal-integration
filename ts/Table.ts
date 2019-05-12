@@ -46,7 +46,7 @@ export class Table {
                     <tr>
                         <th>Start [min]</th>
                         <th>End [min]</th>
-                        <th>Response [mV/s]</th>
+                        <th>Response [mV.s]</th>
                     </tr>
                 </thead>
                 <tbody>

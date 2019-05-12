@@ -315,18 +315,22 @@ export class Chart {
         this.ctx.textAlign = 'right';
         this.ctx.textBaseline = 'middle';
 
+        let prevY = -20;
+
         const minSignal = Math.floor(this.min.signal);
         for (let s = minSignal; s < this.max.signal; s += 0.5) {
             let y = this.padding.t + height - ((s - this.min.signal) * heightRatio);
 
-            if (y <= this.canvas.height - this.padding.b) {
+            if (y <= this.canvas.height - this.padding.b && Math.abs(prevY - y) >= 20) {
                 y = Math.floor(y) + 0.5;
                 this.ctx.beginPath();
                 this.ctx.moveTo(this.padding.l, y);
                 this.ctx.lineTo(this.padding.l - 5, y);
                 this.ctx.stroke();
                 this.ctx.fillText(s.toFixed(1), this.padding.l - 10, y);
+                prevY = y;
             }
+
         }
     }
 
