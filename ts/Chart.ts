@@ -144,6 +144,11 @@ export class Chart {
 
     public setData (data: IData) {
         this.data = data;
+        this.marks = [];
+
+        this.min = undefined;
+        this.max = undefined;
+        this.range = undefined;
 
         this.minTime = this.data.values[0].time;
         this.maxTime = this.data.values[this.data.values.length - 1].time;

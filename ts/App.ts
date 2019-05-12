@@ -27,6 +27,7 @@ export class App {
         window.onresize = () => {
             this.resize();
             this.chart.render();
+            this.table.update();
         };
 
         this.resize();
