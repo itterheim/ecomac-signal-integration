@@ -35,7 +35,7 @@ export class Table {
                 <td>${i + 1}</td>
                 <td>${peak.start.toFixed(this.decimals)}</td>
                 <td>${peak.end.toFixed(this.decimals)}</td>
-                <td>${peak.retention.time.toFixed(this.decimals)}</td>
+                <td>${(peak.retention.time - peak.start).toFixed(this.decimals)}</td>
                 <td>${peak.retention.signal.toFixed(this.decimals)}</td>
                 <td>${(peak.response * 60).toFixed(this.decimals)}</td>
             </tr>`;
@@ -49,7 +49,7 @@ export class Table {
                         <th>Start [min]</th>
                         <th>End [min]</th>
                         <th>Reten. Time [min]</th>
-                        <th>Reten. Signal [mV]</th>
+                        <th>Max. Signal [mV]</th>
                         <th>Response [mV.s]</th>
                     </tr>
                 </thead>

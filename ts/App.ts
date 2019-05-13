@@ -1,5 +1,5 @@
 import { Chart } from './Chart';
-import { getData } from './Data';
+import { Data } from './Data';
 import { IData } from './interfaces/IData';
 import { IMark } from './interfaces/IMark';
 import { Table } from './Table';
@@ -33,7 +33,6 @@ export class App {
         };
 
         this.resize();
-        this.run();
     }
 
     private createUI () {
@@ -54,7 +53,7 @@ export class App {
                     <b>m</b> or hold <b>Ctrl</b> - Move<br/>
                     <b>mouse wheel</b> - Zoom<br/>
                 </div>
-                <div id="version">Version: 2019-05-12T20:50:00+0200</div>
+                <div id="version">Version: 2019-05-13T17:10:00+0200</div>
             </div>
         `;
         document.body.insertAdjacentHTML('afterbegin', template);
@@ -93,7 +92,7 @@ export class App {
         };
 
         input.onchange = async (e) => {
-            this.data = await getData(input.files[0]);
+            this.data = await this.getData(input.files[0]);
 
             if (this.data) {
                 this.chart.setData(this.data);
@@ -101,10 +100,25 @@ export class App {
         };
     }
 
-    private async run () {
-        // this.data = await getData();
+    private async getData (file: File): Promise<IData> {
+        const text = await this.readFile(file);
 
-        // this.chart.setData(this.data);
+        // return parseData(text);
+        return new Data(text);
+    }
+
+    private async readFile (file: File): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsText(file);
+
+            reader.onload = () => {
+                resolve(reader.result.toString());
+            };
+            reader.onerror = (e) => {
+                reject(e);
+            };
+        });
     }
 
     private resize () {
