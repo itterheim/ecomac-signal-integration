@@ -5,6 +5,7 @@ import { IValue } from './interfaces/IValue';
 export class Table {
     private marks: IMark[] = [];
     private values: IValue[] = [];
+    private peaks: IPeak[] = [];
 
     private maxSignal: number = 0;
     private minSignal: number = 0;
@@ -25,11 +26,11 @@ export class Table {
 
         this.target.innerHTML = '';
 
-        const peaks = this.getPeaks(marks);
+        this.peaks = this.getPeaks();
 
         let rows = '';
-        for (let i = 0; i < peaks.length; i++) {
-            const peak = peaks[i];
+        for (let i = 0; i < this.peaks.length; i++) {
+            const peak = this.peaks[i];
             rows += `
             <tr>
                 <td>${i + 1}</td>
@@ -62,13 +63,45 @@ export class Table {
         this.target.innerHTML = template;
     }
 
-    private getPeaks (marks: IMark[]): IPeak[] {
+    public exportCsv (name: string) {
+        const headers = [
+            '#',
+            'Start [min]',
+            'End [min]',
+            'Retention Time [min]',
+            'Maximal Signal [mV]',
+            'Response [mV.s]'
+        ];
+        const rows = this.peaks.map((peak, i) => [
+            i + 1,
+            peak.start.toFixed(this.decimals),
+            peak.end.toFixed(this.decimals),
+            (peak.retention.time - peak.start).toFixed(this.decimals),
+            peak.retention.signal.toFixed(this.decimals),
+            (peak.response * 60).toFixed(this.decimals)
+        ]);
+
+        const csv = headers.join(',') + '\n' + rows.map((x) => x.join(',')).join('\n');
+        this.download(csv, name);
+    }
+
+    private download (data: string, name: string) {
+        const blob = new Blob([data]);
+
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.target = '_blank';
+        a.download = name;
+        a.click();
+    }
+
+    private getPeaks (): IPeak[] {
 
         const peaks: IPeak[] = [];
 
         let lastMarks: IMark[] = [];
-        for (let i = 0; i < marks.length; i++) {
-            const mark = marks[i];
+        for (let i = 0; i < this.marks.length; i++) {
+            const mark = this.marks[i];
 
             if (mark.type === 'start') {
                 lastMarks.push(mark);

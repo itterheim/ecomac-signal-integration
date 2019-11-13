@@ -13,7 +13,7 @@ export class Data implements IData {
     private maxSignal: number;
     private minSignal: number;
 
-    constructor (text: string) {
+    constructor (public name: string, text: string) {
         this.parseData(text);
 
         const signals = this.values.map((x) => x.signal);

@@ -44,6 +44,8 @@ export class App {
                 <button id="end">End</button>
                 <button id="move">Move</button>
                 <br/><br/>
+                <button id="export">Export to CSV</button>
+                <br/><br/>
                 <input type="file" name="datafile" id="datafile" accept="text/plain" />
                 <br/><br/>
                 <div class="shortcuts">
@@ -53,7 +55,7 @@ export class App {
                     <b>m</b> or hold <b>Ctrl</b> - Move<br/>
                     <b>mouse wheel</b> - Zoom<br/>
                 </div>
-                <div id="version">Version: 2019-05-13T17:10:00+0200</div>
+                <div id="version">Version: 2019-11-13T20:00:00+0100</div>
             </div>
         `;
         document.body.insertAdjacentHTML('afterbegin', template);
@@ -65,6 +67,7 @@ export class App {
         const start = document.getElementById('start');
         const end = document.getElementById('end');
         const move = document.getElementById('move');
+        const exportCsv = document.getElementById('export');
         const input = document.getElementById('datafile') as HTMLInputElement;
 
         start.onclick = () => {
@@ -91,7 +94,13 @@ export class App {
             this.chart.setTool('move');
         };
 
-        input.onchange = async (e) => {
+        exportCsv.onclick = () => {
+            if (this.data) {
+                this.table.exportCsv(this.data.name.replace(/\.[^.]+$/i, ''));
+            }
+        };
+
+        input.onchange = async () => {
             this.data = await this.getData(input.files[0]);
 
             if (this.data) {
@@ -103,8 +112,7 @@ export class App {
     private async getData (file: File): Promise<IData> {
         const text = await this.readFile(file);
 
-        // return parseData(text);
-        return new Data(text);
+        return new Data(file.name, text);
     }
 
     private async readFile (file: File): Promise<string> {

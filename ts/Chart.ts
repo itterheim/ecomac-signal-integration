@@ -1,6 +1,6 @@
-import { IData } from "./interfaces/IData";
-import { IMark } from "./interfaces/IMark";
-import { IValue } from "./interfaces/IValue";
+import { IData } from './interfaces/IData';
+import { IMark } from './interfaces/IMark';
+import { IValue } from './interfaces/IValue';
 
 type Tool = 'start' | 'end' | 'move';
 
@@ -29,11 +29,14 @@ export class Chart {
     private selectionIndex: number;
 
     constructor (private canvas: HTMLCanvasElement) {
+        this.canvas.className = `tool-${this.tool}`;
         this.ctx = this.canvas.getContext('2d');
 
         let mouseStart: { x: number, y: number };
 
         this.canvas.onwheel = (e) => {
+            if (!this.data) { return; }
+
             e.preventDefault();
 
             const width = this.scale * this.canvas.width;
@@ -53,6 +56,8 @@ export class Chart {
         };
 
         this.canvas.onmousedown = (e) => {
+            if (!this.data) { return; }
+
             if (this.tool === 'move' || e.ctrlKey) {
                 mouseStart = this.getMousePosition(e);
             } else if (this.selectionIndex !== undefined) {
@@ -97,6 +102,8 @@ export class Chart {
         };
 
         this.canvas.onmousemove = (e) => {
+            if (!this.data) { return; }
+
             if (mouseStart) {
                 const position = this.getMousePosition(e);
 
@@ -129,7 +136,17 @@ export class Chart {
             if (e.code === 'KeyE') { this.tool = 'end'; }
             if (e.code === 'KeyM') { this.tool = 'move'; }
 
+            this.canvas.style.cursor = '';
+
             this.render();
+        };
+
+        document.onkeydown = (e) => {
+            if (e.ctrlKey) {
+                this.canvas.style.cursor = 'move';
+            // } else {
+            //     this.canvas.style.cursor = undefined;
+            }
         };
     }
 
@@ -142,26 +159,17 @@ export class Chart {
         this.selectionTime = undefined;
         this.selectionIndex = undefined;
 
-        this.min = undefined;
-        this.max = undefined;
-        this.range = undefined;
-
         this.minTime = this.data.values[0].time;
         this.maxTime = this.data.values[this.data.values.length - 1].time;
         this.timeRange = this.maxTime - this.minTime;
 
-        for (const value of this.data.values) {
-            if (!this.min || this.min.signal > value.signal) { this.min = value; }
-            if (!this.max || this.max.signal < value.signal) { this.max = value; }
-        }
-
-        this.range = this.max.signal - this.min.signal;
-
+        this.adjustMinMax();
         this.render();
     }
 
     public setTool (tool: Tool) {
         this.tool = tool;
+        this.canvas.className = `tool-${this.tool}`;
         this.selectionIndex = undefined;
         this.selectionTime = undefined;
     }
@@ -169,10 +177,32 @@ export class Chart {
     public render () {
         this.clear();
 
+        this.adjustMinMax();
+
         if (this.data) {
             this.renderData();
             this.renderAxis();
         }
+    }
+
+    private adjustMinMax () {
+        if (!this.data) { return; }
+
+        const width = this.scale * (this.canvas.width - this.padding.l - this.padding.r);
+        const widthRatio = width / this.timeRange;
+        const visibleData = this.data.values.filter((value) => {
+            const x = this.offset + (value.time - this.minTime) * widthRatio;
+            return x > 0 && x < this.canvas.width;
+        });
+
+        this.min = undefined;
+        this.max = undefined;
+        this.range = undefined;
+        for (const value of visibleData) {
+            if (!this.min || this.min.signal > value.signal) { this.min = value; }
+            if (!this.max || this.max.signal < value.signal) { this.max = value; }
+        }
+        this.range = this.max.signal - this.min.signal;
     }
 
     private renderData () {
@@ -216,8 +246,10 @@ export class Chart {
             this.ctx.moveTo(selectedX, selectedY);
             if (this.tool === 'start') {
                 this.ctx.lineTo(selectedX, selectedY + 15);
+                this.ctx.strokeStyle = '#0b0';
             } else if (this.tool === 'end') {
-                this.ctx.lineTo(selectedX, selectedY - 15);
+                this.ctx.lineTo(selectedX, selectedY + 15);
+                this.ctx.strokeStyle = '#d00';
             }
             this.ctx.stroke();
         }
@@ -226,17 +258,33 @@ export class Chart {
             const x = this.offset + (mark.time - this.minTime) * widthRatio;
             const y = this.padding.t + height - ((mark.signal - this.min.signal) * heightRatio);
 
+            this.ctx.lineCap = 'round';
             this.ctx.lineWidth = 1;
-            this.ctx.beginPath();
-            this.ctx.moveTo(x, y);
             if (mark.type === 'start') {
-                this.ctx.strokeStyle = '#0fbe05';
-                this.ctx.lineTo(x, y + 10);
+                this.ctx.beginPath();
+                this.ctx.strokeStyle = '#0b0';
+                this.ctx.fillStyle = '#0b0';
+
+                this.ctx.moveTo(x, y);
+                this.ctx.lineTo(x, y + 5);
+                this.ctx.lineTo(x + 5, y + 10);
+                this.ctx.lineTo(x, y + 15);
+                this.ctx.closePath();
+                this.ctx.fill();
+                this.ctx.stroke();
             } else if (mark.type === 'end') {
+                this.ctx.beginPath();
                 this.ctx.strokeStyle = '#d00';
-                this.ctx.lineTo(x, y - 10);
+                this.ctx.fillStyle = '#d00';
+
+                this.ctx.moveTo(x, y);
+                this.ctx.lineTo(x, y + 5);
+                this.ctx.lineTo(x - 5, y + 10);
+                this.ctx.lineTo(x, y + 15);
+                this.ctx.closePath();
+                this.ctx.fill();
+                this.ctx.stroke();
             }
-            this.ctx.stroke();
         }
 
         let lineStart: IPoint;
@@ -259,7 +307,7 @@ export class Chart {
             }
         }
 
-        this.ctx.fillStyle = 'rgba(255,255,255,1)';
+        this.ctx.fillStyle = 'rgba(255,255,255,0.9)';
         this.ctx.fillRect(0, 0, this.padding.l, this.canvas.height);
     }
 

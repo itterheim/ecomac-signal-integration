@@ -11,6 +11,15 @@ canvas {
     border-bottom: 1px solid #777;
 }
 
+canvas.tool-move {
+    cursor: move;
+}
+
+canvas.tool-start,
+canvas.tool-end {
+    cursor: pointer;
+}
+
 div {
     box-sizing: border-box;
 }
