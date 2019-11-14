@@ -91,7 +91,7 @@ export class Table {
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.target = '_blank';
-        a.download = name;
+        a.download = name + '.csv';
         a.click();
     }
 
