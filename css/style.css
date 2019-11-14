@@ -1,121 +1,87 @@
 html, body { margin: 0; padding: 0; overflow: hidden; font-family: sans-serif; font-size: 13px; }
 
-canvas {
-    width: 100%;
-    height: 100%;
-    /* width: 100vw; */
-    /* height: 100vh; */
-    display: block;
-    image-rendering: pixelated;
+div.app {
+    position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+    display: flex;
+    flex-direction: column;
 
-    border-bottom: 1px solid #777;
-}
+    background-color: #8EC5FC;
+    background-image: linear-gradient(62deg, #8EC5FC 0%, #E0C3FC 100%);
 
-canvas.tool-move {
-    cursor: move;
-}
-
-canvas.tool-start,
-canvas.tool-end {
-    cursor: pointer;
-}
-
-div {
+    padding: 10px;
     box-sizing: border-box;
 }
 
-div#table {
-    display: block;
-    overflow: auto;
-    float: left;
-    width: 60%;
-    border-right: 1px solid #777;
+div.menu {
+    margin-bottom: 10px;
+    display: flex;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-table thead th {
-    border-bottom: 1px solid #aaa;
-    padding: 5px 0;
-}
-
-table thead th.number {
-    width: 0;
-    padding-left: 20px;
-}
-
-table thead th:last-child {
-    padding-right: 20px;
-}
-
-table tbody td {
-    font-family: monospace;
-    text-align: right;
-    padding: 3px 10px;
-    border-right: 1px solid #aaa;
-    border-bottom: 1px solid #aaa;
-}
-
-
-table tbody td:last-child {
-    border-right: none;
-    padding-right: 20px;
-}
-
-div#controls {
-    display: block;
-    overflow: auto;
-    float: right;
-    width: 40%;
-    padding: 20px;
-    text-align: center;
-}
-
-button {
-    border: 1px solid #777;
-    background: #fff;
-    border-radius: 2px;
-    padding: 3px 5px;
-    margin: 5px;
-    outline: none;
+div.menu button {
     cursor: pointer;
+    outline: none;
+    border: none;
+    height: 30px;
+    min-width: 30px;
+    border-radius: 3px;
+    margin-right: 20px;
+    min-width: 80px;
+    
+    background: #fff;
+    transition: background 0.25s;
 }
 
-button.selected {
+div.menu button:hover {
     background: #eee;
 }
 
-button#start {
-    border-color: #0fbe05
+/* div.menu button#load { } */
+/* div.menu button#export { } */
+div.menu button#start { margin-right: 2px; border-radius: 3px 0 0 3px; }
+div.menu button#end { border-radius: 0 3px 3px 0; }
+/* div.menu button#move { } */
+div.menu button#zoom-reset { margin-right: 2px; border-radius: 3px 0 0 3px; }
+div.menu button#zoom-mode { margin-right: 0px; border-radius: 0 3px 3px 0; }
+
+div.chart {
+    flex: auto;
+    background: rgba(255,255,255,0.5);
+    border-radius: 3px 3px 0 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+div.chart div.no-data {
+    font-size: 4em;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0px 0px 5px rgba(0,0,0,0.2)    ;
 }
 
-button#end {
-    border-color: #d00
+div.table {
+    margin-top: 10px;
+    border-radius: 0 0 3px 3px;
+    overflow: auto;
+    height: 140px;
+    background: rgba(255,255,255,0.5);
 }
 
-input#datafile {
-    border: 1px solid #777;
-    background: #fff;
-    border-radius: 2px;
-    padding: 2px
+div.table table {
+    border-collapse: collapse;
+    width: 100%;
 }
 
-div.shortcuts {
+div.table table thead tr {
+    border-bottom: 1px solid #fff;
+}
+
+div.table table thead tr th {
+    padding: 4px 5px;
+    font-weight: normal;
     text-align: left;
-    display: inline-block;
 }
 
-div#version {
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    background: #fff;
-    padding: 2px 1px 1px 2px;
-    font-size: 11px;
-    border: 1px solid #777;
-    border-radius: 3px 0 0 0;
-    border-width: 1px 0 0 1px;
+div.table table tbody tr td {
+    padding: 3px 5px;
 }

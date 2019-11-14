@@ -8,7 +8,7 @@ declare global {
     }
 }
 
-// parcel-bundler: cleanup after auto reload
+// parcel-bunder: cleanup after auto reload
 let dead = document.body.querySelector('canvas') as HTMLElement;
 if (dead) {
     dead.parentNode.removeChild(dead);
